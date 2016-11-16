@@ -15,6 +15,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -59,8 +60,6 @@ public class AppActivity extends AppCompatActivity  implements OnMapReadyCallbac
                     // no network
                     Toast.makeText(AppActivity.this, "No network", Toast.LENGTH_SHORT).show();
                 }
-
-
             }
         });
     }
@@ -68,11 +67,13 @@ public class AppActivity extends AppCompatActivity  implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //Default values for google map
+        UiSettings settings = mMap.getUiSettings();
+        settings.setZoomControlsEnabled(true);
+        settings.setCompassEnabled(true);
 
-        // Add a marker in Sydney, Australia, and move the camera.
         LatLng toronto = new LatLng(43.6667, -79.4167);
         mMap.addMarker(new MarkerOptions().position(toronto).title("Marker in Toronto"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(toronto));
-        mMap.moveCamera(CameraUpdateFactory.zoomBy(08.0f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(toronto, 14.0f));
     }
 }
