@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Explorer Map</string>
+    <string name="iplookupurl">http://geo.groupkt.com/ip/%s/json</string>
+</resources>
