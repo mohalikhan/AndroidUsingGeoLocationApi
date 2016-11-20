@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scs2682.androidusinggeolocationapi.networkinfo.NetworkLookupInfo
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:paddingTop="10dp"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/addressText"
+        android:textSize="20sp"
+        android:hint="Enter IP Address"
+        android:inputType="text"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <View
+        android:id="@+id/divider"
+        android:background="#cccccc"
+        android:layout_below="@id/addressText"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <Button
+        android:id="@+id/lookup"
+        android:text="Lookup"
+        android:layout_below="@id/divider"
+        android:layout_marginBottom="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</scs2682.androidusinggeolocationapi.networkinfo.NetworkLookupInfo>
