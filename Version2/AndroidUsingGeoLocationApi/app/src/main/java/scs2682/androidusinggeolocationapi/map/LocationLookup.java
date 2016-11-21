@@ -17,6 +17,6 @@ public class LocationLookup extends LinearLayout {
         this.adapter = adapter;
     }
 
-    public void updateContact(NetworkLookup networkLookup, int positionInContacts) {
+    public void updateContact(NetworkLookup networkLookup) {
     }
 }

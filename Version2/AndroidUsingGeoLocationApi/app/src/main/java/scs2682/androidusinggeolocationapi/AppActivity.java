@@ -6,12 +6,9 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +22,7 @@ public class AppActivity extends AppCompatActivity {
     private static final class Page {
         private final int layoutId;
 
-        private Page(final int layoutId, @NonNull final String title) {
+        private Page(final int layoutId) {
             this.layoutId = layoutId;
         }
     }
@@ -48,9 +45,9 @@ public class AppActivity extends AppCompatActivity {
             this.viewPager = viewPager;
             layoutInflater = LayoutInflater.from(context);
 
-            pages = new ArrayList<>(1);
-            pages.add(POSITION_NETWORKLOOKUPINFO, new Page(R.layout.networklookupinfo, ""));
-            //pages.add(POSITION_LOCATIONLOOKUP, new Page(R.layout.locationlookup, ""));
+            pages = new ArrayList<>(2);
+            pages.add(POSITION_NETWORKLOOKUPINFO, new Page(R.layout.networklookupinfo));
+            //pages.add(POSITION_LOCATIONLOOKUP, new Page(R.layout.locationlookup));
         }
 
         @Override
@@ -63,10 +60,10 @@ public class AppActivity extends AppCompatActivity {
                 networkLookupInfo = (NetworkLookupInfo) view;
                 networkLookupInfo.setAdapter(this);
             }
-            /*else if (view instanceof LocationLookup) {
+            else if (view instanceof LocationLookup) {
                locationLookup = (LocationLookup) view;
                locationLookup.setAdapter(this);
-            }*/
+            }
             return view;
         }
 
@@ -85,18 +82,15 @@ public class AppActivity extends AppCompatActivity {
             return object == view;
         }
 
-        public void onOpenMap(NetworkLookup networkLookup, int positionInNetworkLookupInfo) {
+        public void onOpenMap(NetworkLookup networkLookup) {
             viewPager.setCurrentItem(POSITION_LOCATIONLOOKUP);
-            locationLookup.updateContact(networkLookup, positionInNetworkLookupInfo);
+            locationLookup.updateContact(networkLookup);
         }
 
-        public void onNetworkLookupUpdated(NetworkLookup networkLookup, int positionInNetworkLookupInfo) {
+        public void onNetworkLookupUpdated() {
             viewPager.setCurrentItem(POSITION_NETWORKLOOKUPINFO);
-            networkLookupInfo.updateContact(networkLookup, positionInNetworkLookupInfo);
         }
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

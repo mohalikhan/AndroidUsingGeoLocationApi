@@ -3,12 +3,13 @@ package scs2682.androidusinggeolocationapi.networkinfo;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,19 +32,18 @@ import scs2682.androidusinggeolocationapi.AppActivity;
 import scs2682.androidusinggeolocationapi.R;
 import scs2682.androidusinggeolocationapi.model.NetworkLookup;
 
-import static android.content.Context.INPUT_METHOD_SERVICE;
-
 public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupInfoClickListener{
 
     private static final class DownloadJsonTask extends AsyncTask<String, Void, NetworkLookup> {
 
         @NonNull
-        private final WeakReference<NetworkLookupInfo> appActivityWeakReference;
+        private final WeakReference<NetworkLookupInfo> networkLookupInfoWeakReference;
 
         private DownloadJsonTask(@NonNull NetworkLookupInfo networkLookupInfo) {
-            appActivityWeakReference = new WeakReference<>(networkLookupInfo);
+            networkLookupInfoWeakReference = new WeakReference<>(networkLookupInfo);
         }
 
+        //background process for json..
         @Override
         protected NetworkLookup doInBackground(String... urls) {
             String urlString = urls != null && urls.length > 0 ? urls[0] : "";
@@ -97,13 +97,12 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
             return networkLookup;
         }
 
+        //when data receive...
         @Override
         protected void onPostExecute(NetworkLookup networkLookup) {
-            //if (appActivityWeakReference.get() != null && appActivityWeakReference.get().isValid()) {
-                // activity is fine, call load Map;
-                //appActivityWeakReference.get().loadMap(networkLookup);
-            //}
-            Log.w("data loaded", networkLookup.ip);
+            if (networkLookupInfoWeakReference.get() != null) {
+               networkLookupInfoWeakReference.get().updateNetworkInfo(networkLookup);
+            }
         }
     }
 
@@ -131,20 +130,11 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         networkLookupInfoAdapter = new NetworkLookupInfoAdapter(context, this);
     }
 
-    public void updateContact(NetworkLookup networkLookup, int positionInNetworkLookupInfo) {
+    public void updateNetworkInfo(NetworkLookup networkLookup) {
+        adapter.onNetworkLookupUpdated();
         if (networkLookup != null) {
-            if (positionInNetworkLookupInfo > -1)
-            {
-                //we are update an already existing Contact in contacts
-                networkLookupInfoAdapter.lookupList.set(positionInNetworkLookupInfo, networkLookup);
-                networkLookupInfoAdapter.notifyItemChanged(positionInNetworkLookupInfo);
-            }
-            else
-            {
-                // -1 means add a new contact at the end of the list
-                networkLookupInfoAdapter.lookupList.add(networkLookup);
-                networkLookupInfoAdapter.notifyItemChanged(networkLookupInfoAdapter.lookupList.size() - 1);
-            }
+            networkLookupInfoAdapter.lookupList.add(networkLookup);
+            networkLookupInfoAdapter.notifyItemChanged(networkLookupInfoAdapter.lookupList.size() - 1);
         }
     }
 
@@ -186,12 +176,18 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
                 }
             }
         });
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(networkLookupInfoAdapter);
     }
 
     @Override
-    public void onContactClick(@NonNull NetworkLookup networkLookup, int positionInNetworkLookupInfo) {
+    public void onNetworkLookupClick(@NonNull NetworkLookup networkLookup) {
         if (adapter != null){
-            adapter.onOpenMap(networkLookup, positionInNetworkLookupInfo);
+            adapter.onOpenMap(networkLookup);
         }
     }
 

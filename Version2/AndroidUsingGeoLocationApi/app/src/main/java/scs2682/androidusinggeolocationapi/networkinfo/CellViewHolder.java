@@ -2,7 +2,6 @@ package scs2682.androidusinggeolocationapi.networkinfo;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import scs2682.androidusinggeolocationapi.R;
@@ -13,17 +12,15 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
     private final TextView longitude;
     private final TextView latitude;
 
-    private int positionInNetworkLookupInfo = -1;
-
-    public CellViewHolder(View view, final OnNetworkLookupInfoClickListener onContactClickListener) {
+    public CellViewHolder(View view, final OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener) {
         super(view);
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                if (onContactClickListener != null) {
+                if (onNetworkLookupInfoClickListener != null) {
                     NetworkLookup networkLookup = new NetworkLookup(ipAddress.getText().toString(), Double.parseDouble(longitude.getText().toString()), Double.parseDouble(latitude.getText().toString()));
-                    onContactClickListener.onContactClick(networkLookup, positionInNetworkLookupInfo);
+                    onNetworkLookupInfoClickListener.onNetworkLookupClick(networkLookup);
                 }
             }
         });
@@ -33,12 +30,10 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
         latitude = (TextView) view.findViewById(R.id.latitude);
     }
 
-    public void update(NetworkLookup networkLookup, int positionInNetworkLookupInfo) {
+    public void update(NetworkLookup networkLookup, int position) {
         ipAddress.setText(networkLookup.ip);
         longitude.setText(String.valueOf(networkLookup.longitude));
         latitude.setText(String.valueOf(networkLookup.latitude));
-
-        this.positionInNetworkLookupInfo = positionInNetworkLookupInfo;
     }
 }
 
