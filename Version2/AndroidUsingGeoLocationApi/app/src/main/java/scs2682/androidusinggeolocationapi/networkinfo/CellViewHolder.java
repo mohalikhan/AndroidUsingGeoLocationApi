@@ -30,7 +30,7 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
         latitude = (TextView) view.findViewById(R.id.latitude);
     }
 
-    public void update(NetworkLookup networkLookup, int position) {
+    public void update(NetworkLookup networkLookup) {
         ipAddress.setText(networkLookup.ip);
         longitude.setText(String.valueOf(networkLookup.longitude));
         latitude.setText(String.valueOf(networkLookup.latitude));

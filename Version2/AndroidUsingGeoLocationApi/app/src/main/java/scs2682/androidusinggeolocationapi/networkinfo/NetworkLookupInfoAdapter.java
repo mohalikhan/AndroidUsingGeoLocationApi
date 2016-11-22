@@ -34,7 +34,7 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
     @Override
     public void onBindViewHolder(CellViewHolder holder, int position) {
         NetworkLookup networkLookup = lookupList.get(position);
-        holder.update(networkLookup, position);
+        holder.update(networkLookup);
     }
 
     @Override

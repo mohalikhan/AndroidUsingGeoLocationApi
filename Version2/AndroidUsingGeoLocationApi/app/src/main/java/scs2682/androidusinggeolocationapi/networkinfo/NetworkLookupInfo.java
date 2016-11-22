@@ -134,7 +134,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         adapter.onNetworkLookupUpdated();
         if (networkLookup != null) {
             networkLookupInfoAdapter.lookupList.add(networkLookup);
-            networkLookupInfoAdapter.notifyItemChanged(networkLookupInfoAdapter.lookupList.size() - 1);
+            networkLookupInfoAdapter.notifyItemInserted(networkLookupInfoAdapter.lookupList.size() - 1);
         }
     }
 
