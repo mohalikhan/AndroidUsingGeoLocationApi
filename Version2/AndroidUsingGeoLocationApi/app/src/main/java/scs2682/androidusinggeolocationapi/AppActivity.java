@@ -1,7 +1,6 @@
 package scs2682.androidusinggeolocationapi;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -47,7 +46,7 @@ public class AppActivity extends AppCompatActivity {
 
             pages = new ArrayList<>(2);
             pages.add(POSITION_NETWORKLOOKUPINFO, new Page(R.layout.networklookupinfo));
-            //pages.add(POSITION_LOCATIONLOOKUP, new Page(R.layout.locationlookup));
+            pages.add(POSITION_LOCATIONLOOKUP, new Page(R.layout.locationlookup));
         }
 
         @Override
@@ -56,13 +55,12 @@ public class AppActivity extends AppCompatActivity {
             View view = layoutInflater.inflate(page.layoutId, container, false);
             container.addView(view);
 
-           if (view instanceof NetworkLookupInfo) {
+            if (view instanceof NetworkLookupInfo) {
                 networkLookupInfo = (NetworkLookupInfo) view;
                 networkLookupInfo.setAdapter(this);
-            }
-            else if (view instanceof LocationLookup) {
-               locationLookup = (LocationLookup) view;
-               locationLookup.setAdapter(this);
+            } else if (view instanceof LocationLookup) {
+                locationLookup = (LocationLookup) view;
+                locationLookup.setAdapter(this);
             }
             return view;
         }
@@ -84,7 +82,7 @@ public class AppActivity extends AppCompatActivity {
 
         public void onOpenMap(NetworkLookup networkLookup) {
             viewPager.setCurrentItem(POSITION_LOCATIONLOOKUP);
-            locationLookup.updateContact(networkLookup);
+            locationLookup.updateMap(networkLookup);
         }
 
         public void onNetworkLookupUpdated() {
