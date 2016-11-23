@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,8 @@ import java.util.regex.Pattern;
 import scs2682.androidusinggeolocationapi.AppActivity;
 import scs2682.androidusinggeolocationapi.R;
 import scs2682.androidusinggeolocationapi.model.NetworkLookup;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupInfoClickListener{
 
@@ -150,6 +153,10 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         findViewById(R.id.lookup).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Hide keyboard
+                InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+                inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
                 //Validation
                 String ipAddress = ipAddressText.getText().toString();
                 if (TextUtils.isEmpty(ipAddress))
