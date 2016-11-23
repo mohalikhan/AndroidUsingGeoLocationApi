@@ -77,7 +77,7 @@ public class LocationLookup extends LinearLayout implements OnMapReadyCallback {
         }
         else {
             // no network
-            Toast.makeText(getContext(), "No network", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "No network available!", Toast.LENGTH_SHORT).show();
         }
     }
 

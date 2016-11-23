@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import scs2682.androidusinggeolocationapi.AppActivity;
 import scs2682.androidusinggeolocationapi.R;
 import scs2682.androidusinggeolocationapi.model.NetworkLookup;
 
@@ -17,6 +18,7 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
 
     private final LayoutInflater layoutInflater;
     private final OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener;
+    private AppActivity.Adapter mainAdapter;
 
     NetworkLookupInfoAdapter(Context context, OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener) {
         layoutInflater = LayoutInflater.from(context);
@@ -34,7 +36,7 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
     @Override
     public void onBindViewHolder(CellViewHolder holder, int position) {
         NetworkLookup networkLookup = lookupList.get(position);
-        holder.update(networkLookup);
+        holder.update(networkLookup, mainAdapter.orientationLand);
     }
 
     @Override
@@ -45,5 +47,9 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public void setMainAdapter(AppActivity.Adapter mainAdapter){
+        this.mainAdapter = mainAdapter;
     }
 }

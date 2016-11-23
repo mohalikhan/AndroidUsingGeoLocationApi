@@ -1,5 +1,6 @@
 package scs2682.androidusinggeolocationapi.networkinfo;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -25,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +43,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
 
         @NonNull
         private final WeakReference<NetworkLookupInfo> networkLookupInfoWeakReference;
-
+        private ProgressDialog progress;
         private DownloadJsonTask(@NonNull NetworkLookupInfo networkLookupInfo) {
             networkLookupInfoWeakReference = new WeakReference<>(networkLookupInfo);
         }
@@ -94,23 +96,43 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
                     networkLookup = new NetworkLookup(jsonObject);
                 }
             }
-            catch(IOException | JSONException e) {
+            catch(NoSuchElementException | IOException | JSONException e) {
                 networkLookup = null;
             }
             return networkLookup;
         }
 
+        //before data load, show progree bar, hides keyboard
+        @Override
+        protected void onPreExecute() {
+            //Hide keyboard
+            InputMethodManager inputMethodManager = (InputMethodManager)networkLookupInfoWeakReference.get().getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(networkLookupInfoWeakReference.get().getWindowToken(), 0);
+
+            if (progress == null) {
+                progress = new ProgressDialog(networkLookupInfoWeakReference.get().getContext());
+                progress.setTitle("Loading");
+                progress.setMessage("Wait while loading...");
+                progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+            }
+            progress.show();
+        }
+
         //when data receive...
         @Override
         protected void onPostExecute(NetworkLookup networkLookup) {
+            if (progress != null && progress.isShowing()) {
+                progress.dismiss();
+            }
+
             if (networkLookupInfoWeakReference.get() != null) {
                networkLookupInfoWeakReference.get().updateNetworkInfo(networkLookup);
             }
         }
     }
 
-    private AppActivity.Adapter adapter;
-    private final List<NetworkLookup> LookupList = new ArrayList<>();
+    private AppActivity.Adapter mainAdapter;
+    private final List<NetworkLookup> lookupList = new ArrayList<>();
     private final NetworkLookupInfoAdapter networkLookupInfoAdapter;
     private static final String PATTERN =
             "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
@@ -134,15 +156,41 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
     }
 
     public void updateNetworkInfo(NetworkLookup networkLookup) {
-        adapter.onNetworkLookupUpdated();
+        mainAdapter.onNetworkLookupUpdated();
         if (networkLookup != null) {
-            networkLookupInfoAdapter.lookupList.add(networkLookup);
-            networkLookupInfoAdapter.notifyItemInserted(networkLookupInfoAdapter.lookupList.size() - 1);
+            if (validateLookupInfo(networkLookup)) {
+                networkLookupInfoAdapter.lookupList.add(networkLookup);
+                networkLookupInfoAdapter.notifyItemInserted(networkLookupInfoAdapter.lookupList.size() - 1);
+            }
         }
     }
 
-    public void setAdapter(AppActivity.Adapter adapter){
-        this.adapter = adapter;
+    private boolean validateLookupInfo(NetworkLookup networkLookup) {
+        //if no location
+        if (networkLookup.latitude == 0.0 || networkLookup.longitude == 0.0) {
+            Toast.makeText(getContext(), "No location of this ip address!", Toast.LENGTH_SHORT)
+                    .show();
+            return false;
+        }
+
+        //if same ip address has been added.
+        final int size = networkLookupInfoAdapter.lookupList.size();
+        if ( size > 0) {
+            for(int i = 0; i < size; i++){
+                NetworkLookup lookup = networkLookupInfoAdapter.lookupList.get(i);
+                if (lookup.ip.equals(networkLookup.ip)) {
+                    Toast.makeText(getContext(), "Data already exists!", Toast.LENGTH_SHORT)
+                            .show();
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void setMainAdapter(AppActivity.Adapter mainAdapter){
+        this.mainAdapter = mainAdapter;
+        networkLookupInfoAdapter.setMainAdapter(mainAdapter);
     }
 
     @Override
@@ -153,10 +201,6 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         findViewById(R.id.lookup).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Hide keyboard
-                InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
-                inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-
                 //Validation
                 String ipAddress = ipAddressText.getText().toString();
                 if (TextUtils.isEmpty(ipAddress))
@@ -193,8 +237,8 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
 
     @Override
     public void onNetworkLookupClick(@NonNull NetworkLookup networkLookup) {
-        if (adapter != null){
-            adapter.onOpenMap(networkLookup);
+        if (mainAdapter != null){
+            mainAdapter.onOpenMap(networkLookup);
         }
     }
 
@@ -203,5 +247,4 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         Matcher matcher = pattern.matcher(ip);
         return matcher.matches();
     }
-
 }

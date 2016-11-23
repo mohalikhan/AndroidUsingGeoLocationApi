@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">AndroidUsingGeoLocationApi</string>
+    <string name="app_name">Lookup IP Address</string>
     <string name="iplookupurl">http://geo.groupkt.com/ip/%s/json</string>
 </resources>

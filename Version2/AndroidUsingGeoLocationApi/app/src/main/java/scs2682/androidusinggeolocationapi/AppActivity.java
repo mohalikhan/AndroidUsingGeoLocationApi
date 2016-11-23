@@ -1,6 +1,8 @@
 package scs2682.androidusinggeolocationapi;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.os.PersistableBundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,8 @@ import scs2682.androidusinggeolocationapi.networkinfo.NetworkLookupInfo;
 
 public class AppActivity extends AppCompatActivity {
 
+    private Adapter adapter;
+    private ViewPager viewPager;
     private static final class Page {
         private final int layoutId;
 
@@ -27,6 +31,8 @@ public class AppActivity extends AppCompatActivity {
     }
 
     public static final class Adapter extends PagerAdapter {
+
+        public boolean orientationLand = false;
 
         private static final int POSITION_NETWORKLOOKUPINFO = 0;
         private static final int POSITION_LOCATIONLOOKUP = 1;
@@ -57,7 +63,7 @@ public class AppActivity extends AppCompatActivity {
 
             if (view instanceof NetworkLookupInfo) {
                 networkLookupInfo = (NetworkLookupInfo) view;
-                networkLookupInfo.setAdapter(this);
+                networkLookupInfo.setMainAdapter(this);
             } else if (view instanceof LocationLookup) {
                 locationLookup = (LocationLookup) view;
                 locationLookup.setAdapter(this);
@@ -91,11 +97,23 @@ public class AppActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        adapter.orientationLand = (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? true : false);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.appactivity);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        viewPager.setAdapter(new Adapter(viewPager));
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        adapter = new Adapter(viewPager);
+        viewPager.setAdapter(adapter);
     }
 }
