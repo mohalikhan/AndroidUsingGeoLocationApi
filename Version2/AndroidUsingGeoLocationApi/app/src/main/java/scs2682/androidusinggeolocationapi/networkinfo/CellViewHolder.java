@@ -1,5 +1,7 @@
 package scs2682.androidusinggeolocationapi.networkinfo;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -17,15 +19,41 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
 
     private NetworkLookup networkLookup;
 
-    public CellViewHolder(View view, final OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener) {
+    public CellViewHolder(View view, final OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener,
+                          final OnViewHolderLongClickListener onViewHolderLongClickListener) {
         super(view);
 
+        //go to map
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 if (onNetworkLookupInfoClickListener != null) {
                     onNetworkLookupInfoClickListener.onNetworkLookupClick(networkLookup);
                 }
+            }
+        });
+
+        //delete record
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Delete Info ?")
+                        .setMessage("Do you want to delete the record ?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                onViewHolderLongClickListener.onViewHolderLongClick(networkLookup, getAdapterPosition());
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //do nothing.
+                            }
+                        })
+                        .show();
+                return true;
             }
         });
 

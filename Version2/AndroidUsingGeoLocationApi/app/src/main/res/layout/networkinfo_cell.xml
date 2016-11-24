@@ -8,6 +8,7 @@
         android:id="@+id/continent"
         android:maxLines="1"
         android:textSize="15sp"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:textColor="@color/textColor"
@@ -16,6 +17,7 @@
         android:id="@+id/address"
         android:maxLines="1"
         android:textSize="15sp"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:textColor="@color/textColor"
@@ -25,6 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:textSize="12sp"
+        android:textStyle="bold"
         android:textColor="@color/smallTextColor"
         android:gravity="left"/>
 
@@ -33,6 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:textSize="12sp"
+        android:textStyle="bold"
         android:textColor="@color/smallTextColor"
         android:gravity="left"/>
     <View

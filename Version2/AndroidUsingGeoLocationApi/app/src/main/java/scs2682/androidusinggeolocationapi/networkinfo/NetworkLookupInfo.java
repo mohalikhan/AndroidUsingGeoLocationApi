@@ -235,6 +235,12 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         recyclerView.setAdapter(networkLookupInfoAdapter);
     }
 
+    private static boolean validate(final String ip){
+        Pattern pattern = Pattern.compile(PATTERN);
+        Matcher matcher = pattern.matcher(ip);
+        return matcher.matches();
+    }
+
     @Override
     public void onNetworkLookupClick(@NonNull NetworkLookup networkLookup) {
         if (mainAdapter != null){
@@ -242,9 +248,13 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         }
     }
 
-    private static boolean validate(final String ip){
-        Pattern pattern = Pattern.compile(PATTERN);
-        Matcher matcher = pattern.matcher(ip);
-        return matcher.matches();
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
     }
 }

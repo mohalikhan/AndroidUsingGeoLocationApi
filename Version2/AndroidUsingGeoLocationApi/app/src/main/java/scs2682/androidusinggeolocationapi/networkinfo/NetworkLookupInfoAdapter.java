@@ -1,7 +1,9 @@
 package scs2682.androidusinggeolocationapi.networkinfo;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +15,12 @@ import scs2682.androidusinggeolocationapi.AppActivity;
 import scs2682.androidusinggeolocationapi.R;
 import scs2682.androidusinggeolocationapi.model.NetworkLookup;
 
-public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolder> {
+public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolder> implements OnViewHolderLongClickListener {
     final List<NetworkLookup> lookupList = new ArrayList<>();
 
     private final LayoutInflater layoutInflater;
     private final OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener;
+
     private AppActivity.Adapter mainAdapter;
 
     NetworkLookupInfoAdapter(Context context, OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener) {
@@ -30,7 +33,7 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
     @Override
     public CellViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = layoutInflater.inflate(R.layout.networkinfo_cell, parent, false);
-        return new CellViewHolder(view, onNetworkLookupInfoClickListener);
+        return new CellViewHolder(view, onNetworkLookupInfoClickListener, this);
     }
 
     @Override
@@ -51,5 +54,12 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
 
     public void setMainAdapter(AppActivity.Adapter mainAdapter){
         this.mainAdapter = mainAdapter;
+    }
+
+    @Override
+    public void onViewHolderLongClick(@NonNull NetworkLookup networkLookup, int position) {
+        lookupList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemChanged(position, lookupList.size());
     }
 }
