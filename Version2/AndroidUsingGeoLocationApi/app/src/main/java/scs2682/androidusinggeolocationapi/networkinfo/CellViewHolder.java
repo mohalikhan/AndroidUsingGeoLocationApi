@@ -1,8 +1,16 @@
 package scs2682.androidusinggeolocationapi.networkinfo;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.TextView;
 
@@ -64,6 +72,16 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void update(NetworkLookup networkLookup, boolean orientationLand) {
+        addressTextView.setText(getAddress(networkLookup));
+        continentTextView.setText(networkLookup.continent);
+        ipAddressTextView.setText(networkLookup.ip + (networkLookup.network == "" ? "" : " - " + networkLookup.network));
+
+        String position = "<font color='#EE0000'>" + String.valueOf(networkLookup.latitude) + ", " + String.valueOf(networkLookup.longitude) + "</font>";
+        positionTextView.setText(Html.fromHtml("Location : " + position + (networkLookup.postal == "" ? "" : " Postal Code: " + networkLookup.postal)));
+        this.networkLookup = networkLookup;
+    }
+
+    private String getAddress(NetworkLookup networkLookup) {
         StringBuilder address = new StringBuilder();
         if (!networkLookup.city.equals(""))
         {
@@ -85,14 +103,8 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
             }
             address.append(networkLookup.country);
         }
-
-        addressTextView.setText(address);
-        continentTextView.setText(networkLookup.continent);
-        ipAddressTextView.setText(networkLookup.ip + (networkLookup.network == "" ? "" : " - " + networkLookup.network));
-        positionTextView.setText("Location : " + String.valueOf(networkLookup.latitude) + ", " + String.valueOf(networkLookup.longitude) +
-                (networkLookup.postal == "" ? "" : " - Postal Code: " + networkLookup.postal));
-
-        this.networkLookup = networkLookup;
+        return address.toString();
     }
+
 }
 
