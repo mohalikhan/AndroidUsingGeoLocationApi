@@ -61,5 +61,6 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
         lookupList.remove(position);
         notifyItemRemoved(position);
         notifyItemChanged(position, lookupList.size());
+        notifyItemRangeChanged(position, lookupList.size());
     }
 }

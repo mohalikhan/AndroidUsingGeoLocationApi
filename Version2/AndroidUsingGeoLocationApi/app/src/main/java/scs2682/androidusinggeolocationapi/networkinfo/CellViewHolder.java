@@ -74,10 +74,10 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
     public void update(NetworkLookup networkLookup, boolean orientationLand) {
         addressTextView.setText(getAddress(networkLookup));
         continentTextView.setText(networkLookup.continent);
-        ipAddressTextView.setText(networkLookup.ip + (networkLookup.network == "" ? "" : " - " + networkLookup.network));
+        ipAddressTextView.setText(Html.fromHtml(getIpAddress(networkLookup)));
+        positionTextView.setText(Html.fromHtml(getPosition(networkLookup)));
 
-        String position = "<font color='#EE0000'>" + String.valueOf(networkLookup.latitude) + ", " + String.valueOf(networkLookup.longitude) + "</font>";
-        positionTextView.setText(Html.fromHtml("Location : " + position + (networkLookup.postal == "" ? "" : " Postal Code: " + networkLookup.postal)));
+        //keep object reference
         this.networkLookup = networkLookup;
     }
 
@@ -106,5 +106,19 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
         return address.toString();
     }
 
+    private String getIpAddress(NetworkLookup networkLookup) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(networkLookup.ip);
+        sb.append((networkLookup.network == "" ? "" : "  " + "<i><font color='#000000'>" +  networkLookup.network+ "</font></i>"));
+        return sb.toString();
+    }
+
+    private String getPosition(NetworkLookup networkLookup) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Location: ");
+        sb.append("<font color='#000000'>" + String.valueOf(networkLookup.latitude) + ", " + String.valueOf(networkLookup.longitude) + "</font>");
+        sb.append((networkLookup.postal == "" ? "" : " Postal Code: " + "<font color='#000000'>" + networkLookup.postal+ "</font>"));
+        return sb.toString();
+    }
 }
 
