@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,6 @@ public class AppActivity extends AppCompatActivity {
     }
 
     public static final class Adapter extends PagerAdapter {
-
-        public boolean orientationLand = false;
 
         private static final int POSITION_NETWORKLOOKUPINFO = 0;
         private static final int POSITION_LOCATIONLOOKUP = 1;
@@ -66,7 +65,6 @@ public class AppActivity extends AppCompatActivity {
                 networkLookupInfo.setMainAdapter(this);
             } else if (view instanceof LocationLookup) {
                 locationLookup = (LocationLookup) view;
-                locationLookup.setAdapter(this);
             }
             return view;
         }
@@ -94,12 +92,15 @@ public class AppActivity extends AppCompatActivity {
         public void onNetworkLookupUpdated() {
             viewPager.setCurrentItem(POSITION_NETWORKLOOKUPINFO);
         }
+
+        public void removeCache(String key) {
+            networkLookupInfo.removeCache(key);
+        }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        adapter.orientationLand = (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? true : false);
     }
 
     @Override
@@ -115,5 +116,7 @@ public class AppActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         adapter = new Adapter(viewPager);
         viewPager.setAdapter(adapter);
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 }

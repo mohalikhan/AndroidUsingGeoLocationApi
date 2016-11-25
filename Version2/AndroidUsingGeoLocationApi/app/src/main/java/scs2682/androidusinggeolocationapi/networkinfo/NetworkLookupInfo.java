@@ -2,8 +2,10 @@ package scs2682.androidusinggeolocationapi.networkinfo;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -35,9 +38,9 @@ import scs2682.androidusinggeolocationapi.AppActivity;
 import scs2682.androidusinggeolocationapi.R;
 import scs2682.androidusinggeolocationapi.model.NetworkLookup;
 
-import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.content.Context.MODE_PRIVATE;
 
-public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupInfoClickListener{
+public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClickListener {
 
     private static final class DownloadJsonTask extends AsyncTask<String, Void, NetworkLookup> {
 
@@ -105,10 +108,6 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         //before data load, show progree bar, hides keyboard
         @Override
         protected void onPreExecute() {
-            //Hide keyboard
-            InputMethodManager inputMethodManager = (InputMethodManager)networkLookupInfoWeakReference.get().getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(networkLookupInfoWeakReference.get().getWindowToken(), 0);
-
             if (progress == null) {
                 progress = new ProgressDialog(networkLookupInfoWeakReference.get().getContext());
                 progress.setTitle("Loading");
@@ -131,6 +130,8 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         }
     }
 
+    public static final String NAME = NetworkLookupInfo.class.getSimpleName();
+    private static final String CACHED_GAME_TIME_KEY = "cachedLookupTime";
     private AppActivity.Adapter mainAdapter;
     private final List<NetworkLookup> lookupList = new ArrayList<>();
     private final NetworkLookupInfoAdapter networkLookupInfoAdapter;
@@ -157,11 +158,56 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
 
     public void updateNetworkInfo(NetworkLookup networkLookup) {
         mainAdapter.onNetworkLookupUpdated();
-        if (networkLookup != null) {
+        if (networkLookup != null && !networkLookup.isEmpty) {
             if (validateLookupInfo(networkLookup)) {
+                updateCache(networkLookup);
                 networkLookupInfoAdapter.lookupList.add(networkLookup);
                 networkLookupInfoAdapter.notifyItemInserted(networkLookupInfoAdapter.lookupList.size() - 1);
             }
+        }
+    }
+
+    private void updateCache(@Nullable NetworkLookup networkLookup) {
+        getContext().getSharedPreferences(NAME, MODE_PRIVATE)
+            .edit()
+            .putLong(CACHED_GAME_TIME_KEY, System.currentTimeMillis())
+            .putString(networkLookup.ip, networkLookup.json.toString())
+            .apply();
+    }
+
+    public void removeCache(String key) {
+        getContext().getSharedPreferences(NAME, MODE_PRIVATE)
+            .edit()
+            .remove(key)
+            .apply();
+    }
+
+    public void setMainAdapter(AppActivity.Adapter mainAdapter){
+        this.mainAdapter = mainAdapter;
+        networkLookupInfoAdapter.setMainAdapter(mainAdapter);
+    }
+
+    private void getCachedData() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(NAME, MODE_PRIVATE);
+        List<NetworkLookup> lookupList = new ArrayList<>();
+        try {
+            Map<String,?> keys = sharedPreferences.getAll();
+            for(Map.Entry<String,?> entry : keys.entrySet()){
+                //check if it is a ip address...
+                if (validate(entry.getKey()))
+                {
+                    lookupList.add(new NetworkLookup( new JSONObject(entry.getValue().toString())));
+                }
+            }
+        }
+        catch(JSONException e) {
+            // not interested
+            e.printStackTrace();
+            lookupList = null;
+        }
+
+        if (lookupList.size() > 0);{
+            networkLookupInfoAdapter.lookupList = lookupList;
         }
     }
 
@@ -188,11 +234,6 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         return true;
     }
 
-    public void setMainAdapter(AppActivity.Adapter mainAdapter){
-        this.mainAdapter = mainAdapter;
-        networkLookupInfoAdapter.setMainAdapter(mainAdapter);
-    }
-
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -201,6 +242,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         findViewById(R.id.lookup).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                hideKeyboard();
                 //Validation
                 String ipAddress = ipAddressText.getText().toString();
                 if (TextUtils.isEmpty(ipAddress))
@@ -235,26 +277,28 @@ public class NetworkLookupInfo extends LinearLayout implements OnNetworkLookupIn
         recyclerView.setAdapter(networkLookupInfoAdapter);
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        getCachedData();
+    }
+
+    @Override
+    public void onViewHolderClick(@NonNull NetworkLookup networkLookup) {
+        if (mainAdapter != null){
+            mainAdapter.onOpenMap(networkLookup);
+        }
+    }
+
     private static boolean validate(final String ip){
         Pattern pattern = Pattern.compile(PATTERN);
         Matcher matcher = pattern.matcher(ip);
         return matcher.matches();
     }
 
-    @Override
-    public void onNetworkLookupClick(@NonNull NetworkLookup networkLookup) {
-        if (mainAdapter != null){
-            mainAdapter.onOpenMap(networkLookup);
-        }
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+    private void hideKeyboard() {
+        //Hide keyboard
+        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
     }
 }

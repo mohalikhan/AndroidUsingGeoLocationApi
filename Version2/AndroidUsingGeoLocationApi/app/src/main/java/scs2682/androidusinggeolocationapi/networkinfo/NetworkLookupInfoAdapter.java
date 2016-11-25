@@ -3,7 +3,6 @@ package scs2682.androidusinggeolocationapi.networkinfo;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,16 +15,16 @@ import scs2682.androidusinggeolocationapi.R;
 import scs2682.androidusinggeolocationapi.model.NetworkLookup;
 
 public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolder> implements OnViewHolderLongClickListener {
-    final List<NetworkLookup> lookupList = new ArrayList<>();
+    public List<NetworkLookup> lookupList = new ArrayList<>();
 
     private final LayoutInflater layoutInflater;
-    private final OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener;
+    private final OnViewHolderClickListener onViewHolderClickListener;
 
     private AppActivity.Adapter mainAdapter;
 
-    NetworkLookupInfoAdapter(Context context, OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener) {
+    NetworkLookupInfoAdapter(Context context, OnViewHolderClickListener onViewHolderClickListener) {
         layoutInflater = LayoutInflater.from(context);
-        this.onNetworkLookupInfoClickListener = onNetworkLookupInfoClickListener;
+        this.onViewHolderClickListener = onViewHolderClickListener;
 
         setHasStableIds(true);
     }
@@ -33,13 +32,13 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
     @Override
     public CellViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = layoutInflater.inflate(R.layout.networkinfo_cell, parent, false);
-        return new CellViewHolder(view, onNetworkLookupInfoClickListener, this);
+        return new CellViewHolder(view, onViewHolderClickListener, this);
     }
 
     @Override
     public void onBindViewHolder(CellViewHolder holder, int position) {
         NetworkLookup networkLookup = lookupList.get(position);
-        holder.update(networkLookup, mainAdapter.orientationLand);
+        holder.update(networkLookup);
     }
 
     @Override
@@ -58,6 +57,7 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
 
     @Override
     public void onViewHolderLongClick(@NonNull NetworkLookup networkLookup, int position) {
+        mainAdapter.removeCache(networkLookup.ip);
         lookupList.remove(position);
         notifyItemRemoved(position);
         notifyItemChanged(position, lookupList.size());

@@ -1,20 +1,11 @@
 package scs2682.androidusinggeolocationapi.networkinfo;
 
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import scs2682.androidusinggeolocationapi.R;
 import scs2682.androidusinggeolocationapi.model.NetworkLookup;
@@ -27,7 +18,7 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
 
     private NetworkLookup networkLookup;
 
-    public CellViewHolder(View view, final OnNetworkLookupInfoClickListener onNetworkLookupInfoClickListener,
+    public CellViewHolder(View view, final OnViewHolderClickListener onViewHolderClickListener,
                           final OnViewHolderLongClickListener onViewHolderLongClickListener) {
         super(view);
 
@@ -35,8 +26,8 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                if (onNetworkLookupInfoClickListener != null) {
-                    onNetworkLookupInfoClickListener.onNetworkLookupClick(networkLookup);
+                if (onViewHolderClickListener != null) {
+                    onViewHolderClickListener.onViewHolderClick(networkLookup);
                 }
             }
         });
@@ -71,7 +62,7 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
         positionTextView = (TextView) view.findViewById(R.id.position);
     }
 
-    public void update(NetworkLookup networkLookup, boolean orientationLand) {
+    public void update(NetworkLookup networkLookup) {
         addressTextView.setText(getAddress(networkLookup));
         continentTextView.setText(networkLookup.continent);
         ipAddressTextView.setText(Html.fromHtml(getIpAddress(networkLookup)));
