@@ -82,8 +82,8 @@ public class LocationLookup extends LinearLayout implements OnMapReadyCallback {
             //load positions
             LatLng location = new LatLng(networkLookup.latitude, networkLookup.longitude);
             googleMap.addMarker(new MarkerOptions().position(location)
-                    .title(networkLookup.city)
-                    .snippet(networkLookup.country)).showInfoWindow();
+                    .title(networkLookup.city + "-" + networkLookup.countryIso2)
+                    .snippet(networkLookup.ip)).showInfoWindow();
 
             //finally, load map with higher zoom.
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14.0f));
