@@ -131,7 +131,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
     }
 
     public static final String NAME = NetworkLookupInfo.class.getSimpleName();
-    private static final String CACHED_GAME_TIME_KEY = "cachedLookupTime";
+    private static final String CACHED_LOOKUP_TIME = "cachedLookupTime";
     private AppActivity.Adapter mainAdapter;
     private final NetworkLookupInfoAdapter networkLookupInfoAdapter;
     private static final String PATTERN =
@@ -172,7 +172,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
     private void updateCache(@Nullable NetworkLookup networkLookup) {
         getContext().getSharedPreferences(NAME, MODE_PRIVATE)
             .edit()
-            .putLong(CACHED_GAME_TIME_KEY, System.currentTimeMillis())
+            .putLong(CACHED_LOOKUP_TIME, System.currentTimeMillis())
             .putString(networkLookup.ip, networkLookup.json.toString())
             .apply();
     }
