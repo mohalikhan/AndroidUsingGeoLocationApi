@@ -133,7 +133,6 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
     public static final String NAME = NetworkLookupInfo.class.getSimpleName();
     private static final String CACHED_GAME_TIME_KEY = "cachedLookupTime";
     private AppActivity.Adapter mainAdapter;
-    private final List<NetworkLookup> lookupList = new ArrayList<>();
     private final NetworkLookupInfoAdapter networkLookupInfoAdapter;
     private static final String PATTERN =
             "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
@@ -161,8 +160,11 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
         if (networkLookup != null && !networkLookup.isEmpty) {
             if (validateLookupInfo(networkLookup)) {
                 updateCache(networkLookup);
-                networkLookupInfoAdapter.lookupList.add(networkLookup);
-                networkLookupInfoAdapter.notifyItemInserted(networkLookupInfoAdapter.lookupList.size() - 1);
+                mainAdapter.addMarker(networkLookup);
+                networkLookupInfoAdapter.lookupList.add(0, networkLookup);
+                networkLookupInfoAdapter.notifyItemInserted(0);
+                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                recyclerView.smoothScrollToPosition(0);
             }
         }
     }
@@ -194,9 +196,10 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
             Map<String,?> keys = sharedPreferences.getAll();
             for(Map.Entry<String,?> entry : keys.entrySet()){
                 //check if it is a ip address...
-                if (validate(entry.getKey()))
+                if (validateIpAddress(entry.getKey()))
                 {
-                    lookupList.add(new NetworkLookup( new JSONObject(entry.getValue().toString())));
+                    NetworkLookup networkLookup = new NetworkLookup( new JSONObject(entry.getValue().toString()));
+                    lookupList.add(networkLookup);
                 }
             }
         }
@@ -252,7 +255,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
                     return;
                 }
                 else {
-                    if (!validate(ipAddress))
+                    if (!validateIpAddress(ipAddress))
                     {
                         Toast.makeText(getContext(), "Invalid IP address", Toast.LENGTH_SHORT)
                                 .show();
@@ -277,6 +280,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
         recyclerView.setAdapter(networkLookupInfoAdapter);
     }
 
+    //if orientation changed.
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -290,15 +294,25 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
         }
     }
 
-    private static boolean validate(final String ip){
+    //validate ip address
+    private static boolean validateIpAddress(final String ip){
         Pattern pattern = Pattern.compile(PATTERN);
         Matcher matcher = pattern.matcher(ip);
         return matcher.matches();
     }
 
+    //hide keyboard, if necessary
     private void hideKeyboard() {
         //Hide keyboard
         InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
+    }
+
+    public void addAllMarkers() {
+        if (mainAdapter != null) {
+            for (int i = 0; i < networkLookupInfoAdapter.lookupList.size(); i++) {
+                mainAdapter.addMarker(networkLookupInfoAdapter.lookupList.get(i));
+            }
+        }
     }
 }

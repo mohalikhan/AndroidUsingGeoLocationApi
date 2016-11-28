@@ -1,12 +1,12 @@
 package scs2682.androidusinggeolocationapi;
 
 import android.content.Context;
-import android.content.res.Configuration;
-import android.os.PersistableBundle;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,6 +65,7 @@ public class AppActivity extends AppCompatActivity {
                 networkLookupInfo.setMainAdapter(this);
             } else if (view instanceof LocationLookup) {
                 locationLookup = (LocationLookup) view;
+                locationLookup.setMainAdapter(this);
             }
             return view;
         }
@@ -96,16 +97,20 @@ public class AppActivity extends AppCompatActivity {
         public void removeCache(String key) {
             networkLookupInfo.removeCache(key);
         }
-    }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
+        public void removeMarker(String key) {
+            locationLookup.removeMarker(key);
+        }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState);
+        public void addMarker(@Nullable NetworkLookup networkLookup) {
+            if (networkLookup != null) {
+                locationLookup.addMarker(networkLookup);
+            }
+        }
+
+        public void addAllMarkers() {
+            networkLookupInfo.addAllMarkers();
+        }
     }
 
     @Override
@@ -118,5 +123,15 @@ public class AppActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        if (keyCode == KeyEvent.KEYCODE_BACK && viewPager.getCurrentItem() == 1) {
+            viewPager.setCurrentItem(0, true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

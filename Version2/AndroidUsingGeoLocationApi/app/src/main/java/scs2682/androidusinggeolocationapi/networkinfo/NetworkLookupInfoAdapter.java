@@ -57,7 +57,11 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
 
     @Override
     public void onViewHolderLongClick(@NonNull NetworkLookup networkLookup, int position) {
+        //remove cache..
         mainAdapter.removeCache(networkLookup.ip);
+        //remove map marker, if it is there..
+        mainAdapter.removeMarker(networkLookup.ip);
+        //finally remove from collection.
         lookupList.remove(position);
         notifyItemRemoved(position);
         notifyItemChanged(position, lookupList.size());
