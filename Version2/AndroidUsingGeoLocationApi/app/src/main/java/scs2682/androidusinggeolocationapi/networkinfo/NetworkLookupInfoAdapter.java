@@ -55,6 +55,7 @@ public class NetworkLookupInfoAdapter extends RecyclerView.Adapter<CellViewHolde
         this.mainAdapter = mainAdapter;
     }
 
+    //Delete record
     @Override
     public void onViewHolderLongClick(@NonNull NetworkLookup networkLookup, int position) {
         //remove cache..

@@ -135,6 +135,7 @@ public class LocationLookup extends LinearLayout implements OnMapReadyCallback {
         return null;
     }
 
+    @Nullable
     private Marker getMarker(@NonNull String key) {
         if (googleMap != null && markers.size() > 0) {
             for(int i = 0; i < markers.size(); i++) {

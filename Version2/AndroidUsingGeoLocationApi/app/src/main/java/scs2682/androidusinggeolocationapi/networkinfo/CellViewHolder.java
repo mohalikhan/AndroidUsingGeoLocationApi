@@ -1,9 +1,11 @@
 package scs2682.androidusinggeolocationapi.networkinfo;
 
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -72,14 +74,15 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
         this.networkLookup = networkLookup;
     }
 
+    @NonNull
     private String getAddress(NetworkLookup networkLookup) {
         StringBuilder address = new StringBuilder();
-        if (!networkLookup.city.equals(""))
+        if (!TextUtils.isEmpty(networkLookup.city))
         {
             address.append(networkLookup.city);
         }
 
-        if (!networkLookup.state.equals(""))
+        if (!TextUtils.isEmpty(networkLookup.state))
         {
             if (address.length() > 0) {
                 address.append(", ");
@@ -87,7 +90,7 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
             address.append(networkLookup.state);
         }
 
-        if (!networkLookup.country.equals(""))
+        if (!TextUtils.isEmpty(networkLookup.country))
         {
             if (address.length() > 0) {
                 address.append(", ");
@@ -97,18 +100,20 @@ public class CellViewHolder extends RecyclerView.ViewHolder {
         return address.toString();
     }
 
+    @NonNull
     private String getIpAddress(NetworkLookup networkLookup) {
         StringBuilder sb = new StringBuilder();
         sb.append(networkLookup.ip);
-        sb.append((networkLookup.network == "" ? "" : "  " + "<i><font color='#000000'>" +  networkLookup.network+ "</font></i>"));
+        sb.append(TextUtils.isEmpty(networkLookup.network) ? "" : "  " + "<i><font color='#000000'>" +  networkLookup.network+ "</font></i>");
         return sb.toString();
     }
 
+    @NonNull
     private String getPosition(NetworkLookup networkLookup) {
         StringBuilder sb = new StringBuilder();
         sb.append("Location: ");
         sb.append("<font color='#000000'>" + String.valueOf(networkLookup.latitude) + ", " + String.valueOf(networkLookup.longitude) + "</font>");
-        sb.append((networkLookup.postal == "" ? "" : " Postal Code: " + "<font color='#000000'>" + networkLookup.postal+ "</font>"));
+        sb.append((TextUtils.isEmpty(networkLookup.postal) ? "" : " Postal Code: " + "<font color='#000000'>" + networkLookup.postal+ "</font>"));
         return sb.toString();
     }
 }

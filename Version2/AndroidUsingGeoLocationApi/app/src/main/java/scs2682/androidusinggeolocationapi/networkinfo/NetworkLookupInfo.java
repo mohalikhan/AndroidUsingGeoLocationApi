@@ -155,6 +155,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
         networkLookupInfoAdapter = new NetworkLookupInfoAdapter(context, this);
     }
 
+    //Add data coming from json result
     public void updateNetworkInfo(NetworkLookup networkLookup) {
         mainAdapter.onNetworkLookupUpdated();
         if (networkLookup != null && !networkLookup.isEmpty) {
@@ -163,12 +164,13 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
                 mainAdapter.addMarker(networkLookup);
                 networkLookupInfoAdapter.lookupList.add(0, networkLookup);
                 networkLookupInfoAdapter.notifyItemInserted(0);
-                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-                recyclerView.smoothScrollToPosition(0);
+                networkLookupInfoAdapter.notifyItemRangeChanged(0, networkLookupInfoAdapter.lookupList.size());
+                ((RecyclerView) findViewById(R.id.recyclerView)).smoothScrollToPosition(0);
             }
         }
     }
 
+    //update cache
     private void updateCache(@Nullable NetworkLookup networkLookup) {
         getContext().getSharedPreferences(NAME, MODE_PRIVATE)
             .edit()
@@ -177,6 +179,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
             .apply();
     }
 
+    //remvoe cache from sharedpreferences
     public void removeCache(String key) {
         getContext().getSharedPreferences(NAME, MODE_PRIVATE)
             .edit()
@@ -184,11 +187,13 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
             .apply();
     }
 
+    //set main activity adapter
     public void setMainAdapter(AppActivity.Adapter mainAdapter){
         this.mainAdapter = mainAdapter;
         networkLookupInfoAdapter.setMainAdapter(mainAdapter);
     }
 
+    //get cache data
     private void getCachedData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(NAME, MODE_PRIVATE);
         List<NetworkLookup> lookupList = new ArrayList<>();
@@ -214,6 +219,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
         }
     }
 
+    //validate data before add to collection
     private boolean validateLookupInfo(NetworkLookup networkLookup) {
         //if no location
         if (networkLookup.latitude == 0.0 || networkLookup.longitude == 0.0) {
@@ -287,6 +293,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
         getCachedData();
     }
 
+    //open map when user clicks
     @Override
     public void onViewHolderClick(@NonNull NetworkLookup networkLookup) {
         if (mainAdapter != null){
@@ -308,6 +315,7 @@ public class NetworkLookupInfo extends LinearLayout implements OnViewHolderClick
         inputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
     }
 
+    //All all markers, data coming from cache.
     public void addAllMarkers() {
         if (mainAdapter != null) {
             for (int i = 0; i < networkLookupInfoAdapter.lookupList.size(); i++) {
